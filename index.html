@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulador USAR Rover SAR RESCUE • Teleoperación FPV & HOTAS (Grupo 4 UAI)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Contenedor WebGL 3D -->
+  <div id="canvas-container"></div>
+
+  <!-- Efectos de Lente Visor VR / FPV (Scanlines, Viñeta, Ruido RF) -->
+  <div id="fpv-overlay">
+    <div class="fpv-scanlines"></div>
+    <div class="fpv-rf-noise" id="fpv-rf-noise"></div>
+    <div class="fpv-vignette"></div>
+  </div>
+
+  <!-- Alerta Dinámica de Ingeniería / Rescate -->
+  <div id="hud-alert-banner"></div>
+
+  <!-- Retícula Central de Realidad Aumentada (Horizonte Artificial + Vector Pan-Tilt + Telémetro) -->
+  <div id="ar-hud-center">
+    <div id="ar-turret-angles" class="ar-floating-readout">
+      PAN-TILT YAW: +0° | PITCH: +0°
+    </div>
+
+    <svg id="reticle-svg" viewBox="0 0 340 340">
+      <!-- Marco fijo del frente del chasis -->
+      <circle cx="170" cy="170" r="115" fill="none" stroke="rgba(0, 240, 255, 0.22)" stroke-width="1.5" stroke-dasharray="6 6" />
+      <path d="M 45 140 L 32 140 L 32 200 L 45 200" fill="none" stroke="#00f0ff" stroke-width="2" />
+      <path d="M 295 140 L 308 140 L 308 200 L 295 200" fill="none" stroke="#00f0ff" stroke-width="2" />
+
+      <!-- Horizonte Artificial Dinámico (Pitch & Roll del Módulo Frontal) -->
+      <g id="reticle-horizon-group">
+        <line x1="85" y1="170" x2="138" y2="170" stroke="#00f0ff" stroke-width="2" />
+        <line x1="202" y1="170" x2="255" y2="170" stroke="#00f0ff" stroke-width="2" />
+        <line x1="125" y1="145" x2="150" y2="145" stroke="rgba(0, 240, 255, 0.5)" stroke-width="1.5" />
+        <line x1="190" y1="145" x2="215" y2="145" stroke="rgba(0, 240, 255, 0.5)" stroke-width="1.5" />
+        <line x1="125" y1="195" x2="150" y2="195" stroke="rgba(0, 240, 255, 0.5)" stroke-width="1.5" />
+        <line x1="190" y1="195" x2="215" y2="195" stroke="rgba(0, 240, 255, 0.5)" stroke-width="1.5" />
+      </g>
+
+      <!-- Cruz central fija -->
+      <path d="M 162 170 L 178 170 M 170 162 L 170 178" stroke="#ff7a29" stroke-width="2" />
+
+      <!-- Punto indicador de dirección de la torreta Pan-Tilt respecto al frente del chasis -->
+      <circle id="reticle-turret-pip" cx="170" cy="170" r="7" fill="rgba(255, 122, 41, 0.35)" stroke="#ff7a29" stroke-width="2" />
+    </svg>
+
+    <div id="ar-rangefinder" class="ar-floating-readout">
+      ToF LÁSER: 12.00 m | DESPEJADO
+    </div>
+  </div>
+
+  <!-- Barra Superior: Identidad UAI Grupo 4 + Brújula / SAS + Botonera Rápida -->
+  <header id="top-bar">
+    <div class="brand-card">
+      <div class="brand-badge">
+        <span class="status-dot"></span>
+        <span>UAI • ROBÓTICA Y TEC. EMERGENTES • GRUPO 4</span>
+      </div>
+      <div class="brand-title">USAR ROVER "SAR RESCUE" • GEMELO DIGITAL</div>
+      <div class="brand-subtitle">
+        A. Yelin • S. Loray • D. Kegler • I. De Giacomo | Teleoperación FPV &amp; HOTAS
+      </div>
+    </div>
+
+    <!-- Brújula Superior y Estado SAS / PID -->
+    <div class="compass-hud">
+      <div class="compass-tape-window">
+        <div class="compass-center-caret">▼</div>
+        <div id="compass-strip"></div>
+      </div>
+      <div class="compass-meta">
+        <span>RUMBO: <strong id="heading-readout" style="color:#00f0ff;">000°</strong></span>
+        <span id="sas-status-pill" class="sas-pill active" title="Click o tecla G para alternar">
+          SAS / PID: ESTABILIZADO
+        </span>
+      </div>
+    </div>
+
+    <!-- Acciones Rápidas de Cámara, Iluminación, LiDAR y Ayuda -->
+    <div class="top-actions">
+      <button id="btn-cam-mode" class="hud-btn accent" title="Alternar entre 1ra Persona (Visor VR FPV) y 3ra Persona">
+        <span>🎥 VISTA: 3RA PERSONA (EXTERIOR)</span>
+        <span class="key-hint">V</span>
+      </button>
+      <button id="btn-pip" class="hud-btn active" title="Mostrar/Ocultar monitor secundario Picture-in-Picture">
+        <span>📺 PiP</span>
+        <span class="key-hint">P</span>
+      </button>
+      <button id="btn-lights" class="hud-btn active" title="Reflectores Chasis + LEDs Solidarios al Pan-Tilt">
+        <span>🔦 LUCES: <span id="lights-label">NORMAL</span></span>
+        <span class="key-hint">L</span>
+      </button>
+      <button id="btn-night" class="hud-btn" title="Simular entorno de derrumbe sin luz solar">
+        <span>🌙 DERRUMBE OSCURO</span>
+        <span class="key-hint">N</span>
+      </button>
+      <button id="btn-lidar" class="hud-btn" title="Proyectar nube de puntos óptica Time-of-Flight / Micro-LiDAR">
+        <span>📡 ToF / LiDAR</span>
+        <span class="key-hint">T</span>
+      </button>
+      <button id="btn-help" class="hud-btn" title="Ver Controles de Teclado y Ficha de Ingeniería">
+        <span>❓ CONTROLES / FICHA</span>
+        <span class="key-hint">H</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Panel Izquierdo: Telemetría en Tiempo Real y Banco de Pruebas de Ingeniería -->
+  <aside id="left-panel">
+    <!-- Tarjeta 1: Configuración Mecánica y Enlace RF -->
+    <div class="hud-card">
+      <div class="card-header">
+        <span>⚙ ARQUITECTURA DE TRACCIÓN Y CHASIS</span>
+        <span>SECC. 1-4</span>
+      </div>
+
+      <div class="selector-group">
+        <div class="selector-label">
+          <span>Tracción (Comparativa en Derrumbe):</span>
+        </div>
+        <div class="segmented-control">
+          <button class="seg-btn active" data-drive="8x8" title="8 Ruedas sobredimensionadas (Fiel a la Imagen Conceptual)">
+            8x8 Concept
+          </button>
+          <button class="seg-btn" data-drive="6x6" title="6 Ruedas independientes (Recomendación Óptima Ingeniería)">
+            6x6 USAR
+          </button>
+          <button class="seg-btn" data-drive="4wd" title="Prototipo Base Cátedra (Chasis rígido y ruedas TT chicas)">
+            4WD Cátedra
+          </button>
+        </div>
+
+        <div class="selector-label" style="margin-top:6px;">
+          <span>Articulación Fuelle Central:</span>
+          <button id="joint-toggle-btn" style="background:none;border:none;color:var(--hud-cyan);font-family:var(--font-mono);font-size:10px;cursor:pointer;text-decoration:underline;">
+            [Tecla M] <span id="joint-mode-val">ACTIVA (SERVO)</span>
+          </button>
+        </div>
+
+        <div class="selector-label" style="margin-top:4px;">
+          <span>Enlace Video / Telemetría (Secc. 5):</span>
+        </div>
+        <select id="rf-link-select" class="rf-select">
+          <option value="58ghz">5.8 GHz Analógico + Sub-GHz (&lt;15 ms • 60 FPS)</option>
+          <option value="qvga">Wi-Fi QVGA 320×240 + UDP (38 ms • 30 FPS)</option>
+          <option value="vga">Wi-Fi VGA 640×480 + HUD AR (55 ms • 18 FPS)</option>
+          <option value="congested">Wi-Fi 2.4 GHz en Hormigón (&gt;115 ms • Cinetosis)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Tarjeta 2: Sensores y Cinemática del Fuelle -->
+    <div class="hud-card">
+      <div class="card-header">
+        <span>📊 TELEMETRÍA FPV &amp; SENSORES</span>
+        <span id="val-latency" class="metric-value green" style="font-size:10px;">14 ms (60 FPS)</span>
+      </div>
+
+      <div class="metric-grid">
+        <div class="metric-box">
+          <span class="metric-label">VELOCIDAD / PWM</span>
+          <div class="metric-value cyan">
+            <span id="val-speed">0.00 m/s</span>
+          </div>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">DESPEJE (CLEARANCE)</span>
+          <div id="val-clearance" class="metric-value green">48 cm</div>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">ÓPTICO ToF / LiDAR</span>
+          <div id="val-tof" class="metric-value cyan">12.00 m</div>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">HC-SR04 ULTRASONIDO</span>
+          <div id="val-ultrasonic" class="metric-value amber">12.00 m</div>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">TORSIÓN FUELLE (ROLL)</span>
+          <div id="val-bellows-roll" class="metric-value">0.0°</div>
+        </div>
+        <div class="metric-box">
+          <span class="metric-label">QUIEBRE FUELLE (YAW)</span>
+          <div id="val-bellows-yaw" class="metric-value">0°</div>
+        </div>
+      </div>
+
+      <div class="progress-row">
+        <div class="progress-header">
+          <span>ENTREGA DE POTENCIA TRACCIÓN</span>
+          <span id="val-pwm">0% PWM</span>
+        </div>
+        <div class="progress-track">
+          <div id="bar-pwm" class="progress-fill orange" style="width: 0%;"></div>
+        </div>
+      </div>
+
+      <!-- Estado de Tracción Rueda por Rueda -->
+      <div class="selector-label" style="margin-top:8px;">
+        <span>Contacto de Neumáticos con Escombros:</span>
+      </div>
+      <div class="chassis-diagram">
+        <div class="wheel-status-grid">
+          <div id="wheel-pill-FL1" class="wheel-pill">FL1: OK</div>
+          <div id="wheel-pill-FR1" class="wheel-pill">FR1: OK</div>
+          <div id="wheel-pill-FL2" class="wheel-pill">FL2: OK</div>
+          <div id="wheel-pill-FR2" class="wheel-pill">FR2: OK</div>
+          <div id="wheel-pill-RL1" class="wheel-pill">RL1: OK</div>
+          <div id="wheel-pill-RR1" class="wheel-pill">RR1: OK</div>
+          <div id="wheel-pill-RL2" class="wheel-pill">RL2: OK</div>
+          <div id="wheel-pill-RR2" class="wheel-pill">RR2: OK</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Panel Derecho: Misión USAR y Teletransporte Rápido a Zonas de Prueba -->
+  <aside id="right-panel">
+    <div class="hud-card">
+      <div class="card-header">
+        <span>🚨 MISIÓN USAR: DETECCIÓN EN DERRUMBE</span>
+        <span>4 OBJETIVOS</span>
+      </div>
+      <div class="beacon-list">
+        <div id="beacon-item-B1" class="beacon-item">
+          <span class="beacon-name">🟠 Sobreviviente #1 (Losas)</span>
+          <span id="beacon-dist-B1" class="beacon-dist">14.8 m</span>
+        </div>
+        <div id="beacon-item-B2" class="beacon-item">
+          <span class="beacon-name">🔵 Caja Negra (Zanja Sísmica)</span>
+          <span id="beacon-dist-B2" class="beacon-dist">36.2 m</span>
+        </div>
+        <div id="beacon-item-B3" class="beacon-item">
+          <span class="beacon-name">🟡 Transpondedor (Rampa Alta)</span>
+          <span id="beacon-dist-B3" class="beacon-dist">34.8 m</span>
+        </div>
+        <div id="beacon-item-B4" class="beacon-item">
+          <span class="beacon-name">🟢 Víctima (Túnel Oscuro)</span>
+          <span id="beacon-dist-B4" class="beacon-dist">52.4 m</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud-card">
+      <div class="card-header">
+        <span>📍 ZONAS DE ENSAYO (TELETRANSPORTE)</span>
+        <span>TECLAS 1-4</span>
+      </div>
+      <div class="zone-buttons">
+        <button class="zone-btn" data-zone="1">[1] Losas Quebradas</button>
+        <button class="zone-btn" data-zone="2">[2] Zanja Sísmica</button>
+        <button class="zone-btn" data-zone="3">[3] Rampa Inclinada</button>
+        <button class="zone-btn" data-zone="4">[4] Túnel Oscuro</button>
+      </div>
+      <button id="btn-sas" class="hud-btn active" style="width:100%;margin-top:7px;justify-content:center;">
+        <span>🧭 ALTERNAR MODO PID/SAS vs MANUAL</span>
+        <span class="key-hint">G</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Marco del Monitor Secundario Picture-in-Picture (Esquina Inferior Derecha) -->
+  <div id="pip-frame">
+    <div class="pip-header">
+      <span id="pip-title">STREAMING ESP32-CAM (FPV)</span>
+      <span>LIVE • RTSP/UDP</span>
+    </div>
+    <div class="pip-footer">
+      <span>TORRETA 2-DoF PAN-TILT</span>
+      <span>TECLA [V] INTERCAMBIAR</span>
+    </div>
+  </div>
+
+  <!-- Consola Inferior Central: Mando HOTAS Virtual Adaptado a Teclado -->
+  <footer id="bottom-hotas-bar">
+    <!-- 1. Palanca de Gases (Throttle HOTAS) -->
+    <div class="hotas-module">
+      <div class="throttle-track">
+        <div class="throttle-zero-line"></div>
+        <div id="throttle-fill"></div>
+        <div id="throttle-handle"></div>
+      </div>
+      <div class="hotas-info">
+        <span class="hotas-title">THROTTLE (TRACCIÓN)</span>
+        <span class="hotas-sub"><span class="kbd">W</span> / <span class="kbd">S</span> Directo</span>
+        <span class="hotas-sub"><span class="kbd">R</span> / <span class="kbd">F</span> Fijar Gases</span>
+        <span class="hotas-sub"><span class="kbd">Espacio</span> Freno 0%</span>
+        <span id="hotas-throttle-val" class="hotas-val">+0%</span>
+      </div>
+    </div>
+
+    <!-- 2. Stick de Dirección y Quiebre Articulado -->
+    <div class="hotas-module">
+      <div class="stick-box">
+        <div class="stick-crosshair-h"></div>
+        <div class="stick-crosshair-v"></div>
+        <div id="drive-stick-dot" class="stick-dot orange"></div>
+      </div>
+      <div class="hotas-info">
+        <span class="hotas-title">STICK DIRECCIÓN</span>
+        <span class="hotas-sub"><span class="kbd">A</span> / <span class="kbd">D</span> Doblar Fuelle</span>
+        <span class="hotas-sub"><span class="kbd">Q</span> / <span class="kbd">E</span> Orbitar Cám.</span>
+        <span id="hotas-steer-val" class="hotas-val">GIRO: 0%</span>
+      </div>
+    </div>
+
+    <!-- 3. Cabezal Pan-Tilt 2-DoF (Simulación IMU Visor VR) -->
+    <div class="hotas-module">
+      <div class="stick-box">
+        <div class="stick-crosshair-h"></div>
+        <div class="stick-crosshair-v"></div>
+        <div id="turret-stick-dot" class="stick-dot"></div>
+      </div>
+      <div class="hotas-info">
+        <span class="hotas-title">VISOR VR / PAN-TILT</span>
+        <span class="hotas-sub"><span class="kbd">↑</span> <span class="kbd">↓</span> <span class="kbd">←</span> <span class="kbd">→</span> Mirar</span>
+        <span class="hotas-sub"><span class="kbd">X</span> Centrar Torreta</span>
+        <span id="hotas-turret-val" class="hotas-val">0° / 0°</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal de Ficha de Ingeniería, Imagen Conceptual y Controles -->
+  <div id="engineering-modal" class="modal-backdrop hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🛠️ SIMULADOR USAR ROVER "SAR RESCUE" • MANUAL DE OPERACIÓN E INGENIERÍA</h2>
+        <button id="btn-close-modal" class="close-modal-btn">CERRAR [ESC / H]</button>
+      </div>
+      <div class="modal-grid">
+        <div>
+          <img src="assets/concept-rover.jpg" alt="Concept Art Rover USAR" class="concept-preview" />
+          <p style="font-size:12px;color:var(--text-muted);line-height:1.5;">
+            <strong>Evolución de Plataforma Educativa a Rover USAR (Grupo 4 - UAI):</strong>
+            Este Gemelo Digital implementa el chasis bi-modular articulado con fuelle central (3 grados de libertad:
+            <em>Yaw</em> de dirección quebrada, <em>Pitch</em> de inclinación y <em>Roll</em> de torsión sobre escombros),
+            ruedas sobredimensionadas con suspensión independiente, torreta Pan-Tilt 2-DoF con iluminación LED solidaria
+            y telemetría dual <strong>HC-SR04 + Óptico ToF / Micro-LiDAR</strong>.
+          </p>
+        </div>
+        <div>
+          <h3 style="font-size:13px;color:var(--hud-cyan);font-family:var(--font-mono);margin-bottom:6px;">
+            MAPEO DE CONTROLES (HOTAS VIRTUAL EN TECLADO)
+          </h3>
+          <table class="controls-table">
+            <thead>
+              <tr>
+                <th>Tecla / Entrada</th>
+                <th>Función en el Rover USAR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="kbd">W</span> / <span class="kbd">S</span></td>
+                <td>Aceleración y Reversa proporcional con rampa exponencial</td>
+              </tr>
+              <tr>
+                <td><span class="kbd">R</span> / <span class="kbd">F</span></td>
+                <td>Subir / Bajar palanca de gases fija (Modo Throttle HOTAS)</td>
+              </tr>
+              <tr>
+                <td><span class="kbd">A</span> / <span class="kbd">D</span></td>
+                <td>Dirección articulada del fuelle central + asistencia diferencial</td>
+              </tr>
+              <tr>
+                <td><span class="kbd">Espacio</span></td>
+                <td>Freno de emergencia y corte de gases a 0% PWM</td>
+              </tr>
+              <tr>
+                <td><span class="kbd">↑</span> <span class="kbd">↓</span> <span class="kbd">←</span> <span class="kbd">→</span></td>
+                <td>Mover Torreta Pan-Tilt 2-DoF (Simulación de giro de cabeza VR)</td>
+              </tr>
+              <tr>
+                <td><span class="kbd">X</span> o <span class="kbd">C</span></td>
+                <td>Centrar Torreta Pan-Tilt al frente del chasis (0°, 0°)</td>
+              </tr>
+              <tr>
+                <td><span class="kbd">V</span></td>
+                <td>Alternar cámara <strong>1ra Persona (FPV VR)</strong> ↔ <strong>3ra Persona</strong></td>
+              </tr>
+              <tr>
+                <td><span class="kbd">P</span></td>
+                <td>Mostrar / Ocultar ventana secundaria <strong>Picture-in-Picture (PiP)</strong></td>
+              </tr>
+              <tr>
+                <td><span class="kbd">G</span></td>
+                <td>Alternar <strong>Modo Estabilizado (PID / SAS)</strong> vs <strong>Manual Directo</strong></td>
+              </tr>
+              <tr>
+                <td><span class="kbd">L</span> / <span class="kbd">N</span></td>
+                <td>Ciclar potencia de <strong>Reflectores LED</strong> / Modo <strong>Derrumbe Oscuro</strong></td>
+              </tr>
+              <tr>
+                <td><span class="kbd">T</span></td>
+                <td>Activar escáner láser 3D <strong>Time-of-Flight / Micro-LiDAR</strong></td>
+              </tr>
+              <tr>
+                <td><span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> <span class="kbd">4</span></td>
+                <td>Teletransportar el rover a las 4 zonas de prueba del derrumbe</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Librería Three.js Local (100% portable y offline) y Módulos del Simulador -->
+  <script src="vendor/three.min.js"></script>
+  <script src="roverBuilder.js"></script>
+  <script src="terrainBuilder.js"></script>
+  <script src="simulator.js"></script>
+</body>
+</html>
