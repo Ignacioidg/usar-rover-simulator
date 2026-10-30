@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Visor Casco VR • USAR Rover SAR RESCUE (Grupo 4 UAI)</title>
+  <style>
+    :root {
+      --hud-cyan: #00f0ff;
+      --hud-orange: #ff7a29;
+      --hud-green: #10b981;
+      --hud-red: #ef4444;
+      --hud-amber: #ffbe0b;
+      --ipd-offset: 0px;
+      --lens-scale: 1.0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      color: #ecf2f8;
+      font-family: 'JetBrains Mono', 'Consolas', monospace, sans-serif;
+    }
+
+    /* Barra flotante de controles para el celular (se oculta sola al entrar en modo casco) */
+    #vr-top-toolbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      background: rgba(8, 14, 22, 0.92);
+      border-bottom: 1px solid rgba(0, 240, 255, 0.35);
+      padding: 8px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    #vr-top-toolbar.auto-hide {
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .vr-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--hud-orange);
+    }
+
+    .vr-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--hud-amber);
+      box-shadow: 0 0 8px var(--hud-amber);
+    }
+
+    .vr-dot.live {
+      background: var(--hud-green);
+      box-shadow: 0 0 8px var(--hud-green);
+    }
+
+    .vr-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .vr-btn {
+      background: rgba(0, 240, 255, 0.14);
+      border: 1px solid rgba(0, 240, 255, 0.45);
+      color: #fff;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .vr-btn.active {
+      background: var(--hud-orange);
+      border-color: #fff;
+    }
+
+    /* Contenedor Principal: Estereoscópico (2 ojos Side-by-Side) o Monoscópico (1 pantalla) */
+    #vr-stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #000;
+      align-items: center;
+      justify-items: center;
+    }
+
+    #vr-stage.mono-mode {
+      grid-template-columns: 1fr;
+    }
+
+    #vr-stage.mono-mode .eye-viewport.right-eye {
+      display: none;
+    }
+
+    #vr-stage.mono-mode .vr-center-divider {
+      display: none;
+    }
+
+    .eye-viewport {
+      position: relative;
+      width: 96%;
+      height: 92%;
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1.5px solid rgba(0, 240, 255, 0.28);
+      background: #05080d;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: scale(var(--lens-scale));
+      box-shadow: inset 0 0 32px rgba(0, 0, 0, 0.9);
+    }
+
+    #vr-stage.mono-mode .eye-viewport {
+      width: 100%;
+      height: 100%;
+      border-radius: 0;
+      border: none;
+    }
+
+    .eye-viewport.left-eye {
+      transform: translateX(var(--ipd-offset)) scale(var(--lens-scale));
+    }
+
+    .eye-viewport.right-eye {
+      transform: translateX(calc(var(--ipd-offset) * -1)) scale(var(--lens-scale));
+    }
+
+    .stream-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Viñeta óptica de lente VR y scanlines sutiles */
+    .eye-lens-vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: radial-gradient(
+        circle at center,
+        transparent 62%,
+        rgba(0, 8, 16, 0.45) 85%,
+        rgba(0, 0, 0, 0.92) 100%
+      );
+    }
+
+    /* HUD superpuesto por ojo (por si el operador quiere telemetría nítida en el casco) */
+    .eye-hud-top {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(4, 12, 20, 0.72);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--hud-cyan);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .eye-hud-bottom {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(4, 12, 20, 0.72);
+      border: 1px solid rgba(255, 122, 41, 0.4);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--hud-orange);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* Línea central de alineación para el tabique del casco VR */
+    .vr-center-divider {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.35);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* Pantalla de espera cuando el botón de Streaming está desactivado en el Simulador */
+    #waiting-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      background: radial-gradient(circle at center, #0d1826 0%, #05080e 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    #waiting-overlay.hidden {
+      display: none;
+    }
+
+    .waiting-card {
+      max-width: 440px;
+      background: rgba(12, 20, 32, 0.9);
+      border: 1px solid var(--hud-orange);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8);
+    }
+
+    .waiting-card h2 {
+      font-size: 16px;
+      color: var(--hud-orange);
+      margin-bottom: 8px;
+    }
+
+    .waiting-card p {
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Barra de ajustes rápidos (tocar la pantalla muestra/oculta la barra) -->
+  <header id="vr-top-toolbar">
+    <div class="vr-brand">
+      <span class="vr-dot" id="conn-dot"></span>
+      <span id="conn-status">CONECTANDO A ROVER USAR...</span>
+    </div>
+    <div class="vr-actions">
+      <button id="btn-sbs" class="vr-btn active">🥽 MODO CASCO VR (2 OJOS)</button>
+      <button id="btn-gyro" class="vr-btn">🧭 GIROSCOPIO: OFF</button>
+      <button id="btn-ipd-minus" class="vr-btn">IPD -</button>
+      <button id="btn-ipd-plus" class="vr-btn">IPD +</button>
+      <button id="btn-fullscreen" class="vr-btn">⛶ PANTALLA COMPLETA</button>
+    </div>
+  </header>
+
+  <!-- Overlay cuando el simulador tiene el botón de Streaming en OFF -->
+  <div id="waiting-overlay">
+    <div class="waiting-card">
+      <h2>🥽 VISOR CASCO VR • USAR ROVER "SAR RESCUE"</h2>
+      <p id="waiting-msg">
+        El teléfono está conectado al servidor Wi-Fi, pero la transmisión está apagada en la PC.<br /><br />
+        Activá el botón <strong>"📡 VR WIFI" (Tecla K)</strong> en el simulador de la PC para iniciar el streaming en vivo.
+      </p>
+      <button id="btn-start-vr-fullscreen" class="vr-btn active" style="padding:10px 16px;font-size:12px;">
+        ▶ ENTRAR EN PANTALLA COMPLETA VR
+      </button>
+    </div>
+  </div>
+
+  <!-- Escenario Estereoscópico Side-by-Side (Izquierda / Derecha) -->
+  <main id="vr-stage">
+    <div class="vr-center-divider"></div>
+
+    <!-- Ojo Izquierdo -->
+    <div class="eye-viewport left-eye">
+      <img id="eye-img-left" class="stream-img" alt="FPV Left Eye" />
+      <div class="eye-lens-vignette"></div>
+      <div class="eye-hud-top" id="hud-top-L">RUMBO: 000° | YAW: 0° PITCH: 0°</div>
+      <div class="eye-hud-bottom" id="hud-bot-L">ToF LÁSER: -- m | 0.00 m/s</div>
+    </div>
+
+    <!-- Ojo Derecho -->
+    <div class="eye-viewport right-eye">
+      <img id="eye-img-right" class="stream-img" alt="FPV Right Eye" />
+      <div class="eye-lens-vignette"></div>
+      <div class="eye-hud-top" id="hud-top-R">RUMBO: 000° | YAW: 0° PITCH: 0°</div>
+      <div class="eye-hud-bottom" id="hud-bot-R">ToF LÁSER: -- m | 0.00 m/s</div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const stage = document.getElementById('vr-stage');
+      const toolbar = document.getElementById('vr-top-toolbar');
+      const waitingOverlay = document.getElementById('waiting-overlay');
+      const imgLeft = document.getElementById('eye-img-left');
+      const imgRight = document.getElementById('eye-img-right');
+      const connDot = document.getElementById('conn-dot');
+      const connStatus = document.getElementById('conn-status');
+
+      let sbsMode = true;
+      let ipdOffset = 0;
+      let gyroEnabled = false;
+      let baseAlpha = null;
+      let baseBeta = null;
+      let hideToolbarTimer = null;
+
+      function scheduleHideToolbar() {
+        if (hideToolbarTimer) clearTimeout(hideToolbarTimer);
+        hideToolbarTimer = setTimeout(() => {
+          if (!waitingOverlay.classList.contains('hidden')) return;
+          toolbar.classList.add('auto-hide');
+        }, 4500);
+      }
+
+      // Tocar cualquier parte del visor muestra la barra superior por 4.5 segundos
+      document.body.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') return;
+        toolbar.classList.toggle('auto-hide');
+        if (!toolbar.classList.contains('auto-hide')) {
+          scheduleHideToolbar();
+        }
+      });
+
+      // Alternar 2 Ojos (Casco VR) vs 1 Pantalla Completa
+      document.getElementById('btn-sbs').addEventListener('click', (e) => {
+        sbsMode = !sbsMode;
+        stage.classList.toggle('mono-mode', !sbsMode);
+        e.target.classList.toggle('active', sbsMode);
+        e.target.textContent = sbsMode ? '🥽 MODO CASCO VR (2 OJOS)' : '📱 MODO MONITOR (1 PANTALLA)';
+      });
+
+      // Ajuste de distancia interpupilar (IPD) para adaptar al casco VR
+      document.getElementById('btn-ipd-minus').addEventListener('click', () => {
+        ipdOffset = Math.max(-28, ipdOffset - 3);
+        document.documentElement.style.setProperty('--ipd-offset', ipdOffset + 'px');
+      });
+      document.getElementById('btn-ipd-plus').addEventListener('click', () => {
+        ipdOffset = Math.min(28, ipdOffset + 3);
+        document.documentElement.style.setProperty('--ipd-offset', ipdOffset + 'px');
+      });
+
+      async function enterFullscreenAndWakeLock() {
+        try {
+          if (document.documentElement.requestFullscreen) {
+            await document.documentElement.requestFullscreen();
+          } else if (document.documentElement.webkitRequestFullscreen) {
+            await document.documentElement.webkitRequestFullscreen();
+          }
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('landscape').catch(() => {});
+          }
+          if ('wakeLock' in navigator) {
+            navigator.wakeLock.request('screen').catch(() => {});
+          }
+        } catch (err) {}
+        scheduleHideToolbar();
+      }
+
+      document.getElementById('btn-fullscreen').addEventListener('click', enterFullscreenAndWakeLock);
+      document.getElementById('btn-start-vr-fullscreen').addEventListener('click', () => {
+        enterFullscreenAndWakeLock();
+      });
+
+      // Giroscopio opcional del celular para mover la torreta Pan-Tilt
+      document.getElementById('btn-gyro').addEventListener('click', async (e) => {
+        if (!gyroEnabled) {
+          if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+              const perm = await DeviceOrientationEvent.requestPermission();
+              if (perm !== 'granted') return;
+            } catch (err) {}
+          }
+          gyroEnabled = true;
+          baseAlpha = null;
+          baseBeta = null;
+          e.target.classList.add('active');
+          e.target.textContent = '🧭 GIROSCOPIO: ON';
+        } else {
+          gyroEnabled = false;
+          e.target.classList.remove('active');
+          e.target.textContent = '🧭 GIROSCOPIO: OFF';
+        }
+      });
+
+      window.addEventListener('deviceorientation', (ev) => {
+        if (!gyroEnabled || ev.alpha === null) return;
+        if (baseAlpha === null) {
+          baseAlpha = ev.alpha;
+          baseBeta = ev.gamma || ev.beta || 0;
+        }
+        let dYaw = ev.alpha - baseAlpha;
+        if (dYaw > 180) dYaw -= 360;
+        if (dYaw < -180) dYaw += 360;
+        const currentTilt = ev.gamma || ev.beta || 0;
+        const dPitch = currentTilt - baseBeta;
+
+        fetch('/api/headtrack', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            yaw: Math.max(-135, Math.min(135, dYaw)),
+            pitch: Math.max(-38, Math.min(52, dPitch))
+          })
+        }).catch(() => {});
+      });
+
+      // Bucle de actualización de imagen de baja latencia + telemetría
+      let isFetchingFrame = false;
+      let lastFrameSeq = -1;
+
+      async function pollStream() {
+        if (!isFetchingFrame) {
+          isFetchingFrame = true;
+          try {
+            const res = await fetch('/api/bundle?t=' + Date.now(), { cache: 'no-store' });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.active && data.frameDataUrl) {
+                waitingOverlay.classList.add('hidden');
+                connDot.classList.add('live');
+                connStatus.textContent = 'EN VIVO • FPV ROVER (' + (data.fps || 25) + ' FPS)';
+
+                if (data.seq !== lastFrameSeq) {
+                  lastFrameSeq = data.seq;
+                  imgLeft.src = data.frameDataUrl;
+                  imgRight.src = data.frameDataUrl;
+                }
+
+                if (data.telemetry) {
+                  const t = data.telemetry;
+                  const topTxt = `RUMBO: ${t.heading}° | PAN-TILT: ${t.turretYaw}° / ${t.turretPitch}°`;
+                  const botTxt = `ToF: ${t.tof} m | VEL: ${t.speed} m/s | DESPEJE: ${t.clearance} cm`;
+                  document.getElementById('hud-top-L').textContent = topTxt;
+                  document.getElementById('hud-top-R').textContent = topTxt;
+                  document.getElementById('hud-bot-L').textContent = botTxt;
+                  document.getElementById('hud-bot-R').textContent = botTxt;
+                }
+              } else {
+                waitingOverlay.classList.remove('hidden');
+                connDot.classList.remove('live');
+                connStatus.textContent = 'EN ESPERA (ACTIVAR BOTÓN VR WIFI EN PC)';
+              }
+            }
+          } catch (err) {
+            connDot.classList.remove('live');
+            connStatus.textContent = 'RECONECTANDO WIFI...';
+          } finally {
+            isFetchingFrame = false;
+          }
+        }
+        requestAnimationFrame(() => setTimeout(pollStream, 28));
+      }
+
+      pollStream();
+    })();
+  </script>
+</body>
+</html>

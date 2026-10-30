@@ -977,3 +977,398 @@ body, html {
   color: #f8fafc;
   font-weight: 700;
 }
+
+/* =========================================================================
+   ESTILOS ESPECIALIZADOS LOGITECH EXTREME 3D PRO (TELEMETRÍA Y CALIBRADOR)
+   ========================================================================= */
+
+.hotas-badge.waiting {
+  border-color: rgba(255, 190, 11, 0.55);
+  background: rgba(30, 22, 10, 0.85);
+  color: var(--hud-amber);
+}
+
+.hotas-badge.connected {
+  border-color: var(--hud-green);
+  background: rgba(8, 35, 24, 0.88);
+  color: var(--hud-green);
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
+}
+
+.hotas-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--hud-amber);
+  box-shadow: 0 0 8px var(--hud-amber);
+  animation: blink 1.4s infinite;
+}
+
+.hotas-badge.connected .hotas-dot {
+  background: var(--hud-green);
+  box-shadow: 0 0 9px var(--hud-green);
+}
+
+/* Marcador de la leva física Throttle Base en la pista de gases */
+#throttle-limit-marker {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  bottom: 100%;
+  background: var(--hud-cyan);
+  box-shadow: 0 0 6px var(--hud-cyan);
+  z-index: 2;
+  pointer-events: none;
+  transition: bottom 0.05s;
+}
+
+.stick-column {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+}
+
+.stick-deadzone-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16%;
+  height: 16%;
+  transform: translate(-50%, -50%);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Barra de Rotación de Puño (Twist Z Rudder) debajo del Stick X/Y */
+.twist-bar-track {
+  width: 76px;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 190, 11, 0.35);
+  border-radius: 5px;
+  position: relative;
+}
+
+.twist-center-tick {
+  position: absolute;
+  left: 50%;
+  top: 1px;
+  bottom: 1px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.twist-bar-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--hud-amber);
+  box-shadow: 0 0 6px var(--hud-amber);
+  transition: left 0.04s;
+}
+
+.pov-octagon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 48px;
+  height: 48px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(0, 240, 255, 0.22);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Matriz en vivo de los 12 botones del Logitech Extreme 3D Pro */
+.hotas-buttons-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.hotas-buttons-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.hotas-btn-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+}
+
+.joy-btn-pill {
+  background: rgba(15, 23, 36, 0.9);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  padding: 4px 5px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.08s;
+  text-align: center;
+}
+
+.joy-btn-pill.base {
+  border-color: rgba(255, 122, 41, 0.32);
+}
+
+.joy-btn-pill:hover {
+  color: #fff;
+  border-color: var(--hud-cyan);
+}
+
+.joy-btn-pill.pressed {
+  background: var(--hud-orange);
+  border-color: #fff;
+  color: #fff;
+  box-shadow: 0 0 10px var(--hud-orange);
+  transform: scale(1.06);
+}
+
+/* Modal de Calibración Logitech Extreme 3D Pro */
+.hotas-modal-content {
+  max-width: 1040px;
+}
+
+.hotas-status-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 190, 11, 0.4);
+  border-left: 4px solid var(--hud-amber);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+
+.hotas-status-strip.connected {
+  border-color: rgba(16, 185, 129, 0.45);
+  border-left-color: var(--hud-green);
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.hotas-calib-grid {
+  display: grid;
+  grid-template-columns: 1.08fr 1fr;
+  gap: 16px;
+}
+
+.hotas-calib-card {
+  background: rgba(7, 12, 20, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.hotas-calib-card h3 {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--hud-cyan);
+  margin-bottom: 6px;
+}
+
+.axis-calib-row {
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  padding: 7px 9px;
+}
+
+.axis-calib-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  gap: 6px;
+}
+
+.axis-name {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.axis-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.axis-select {
+  background: #090f18;
+  color: var(--hud-cyan);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.learn-axis-btn {
+  background: rgba(255, 122, 41, 0.16);
+  border: 1px solid var(--hud-orange);
+  color: var(--hud-orange);
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.learn-axis-btn.learning {
+  background: var(--hud-orange);
+  color: #fff;
+  animation: blink 0.6s infinite;
+}
+
+.inv-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+}
+
+.axis-bar-bg {
+  width: 100%;
+  height: 7px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.axis-bar-fill {
+  height: 100%;
+  background: var(--hud-cyan);
+  transition: width 0.04s;
+}
+
+.axis-bar-fill.orange { background: var(--hud-orange); }
+.axis-bar-fill.amber { background: var(--hud-amber); }
+.axis-bar-fill.green { background: var(--hud-green); }
+
+.hotas-tuning-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tuning-row label {
+  display: block;
+  font-size: 10.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.slider-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.hud-range {
+  width: 100%;
+  accent-color: var(--hud-orange);
+  cursor: pointer;
+}
+
+.raw-axes-box {
+  margin-top: 10px;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(0, 240, 255, 0.2);
+  border-radius: 6px;
+  padding: 7px 9px;
+}
+
+.raw-axes-readout {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--hud-cyan);
+  margin-top: 3px;
+  word-break: break-all;
+}
+
+.hotas-map-table tr.active-row {
+  background: rgba(255, 122, 41, 0.28);
+}
+
+.hotas-map-table tr.active-row td {
+  color: #fff;
+}
+
+/* Estilos para Botón y Modal de Streaming VR Wi-Fi bajo demanda */
+.vr-wifi-btn {
+  border-color: rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 36, 0.85);
+  color: var(--text-muted);
+}
+
+.vr-wifi-btn.active {
+  border-color: var(--hud-cyan);
+  background: rgba(0, 240, 255, 0.18);
+  color: var(--hud-cyan);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.35);
+}
+
+.vr-wifi-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #64748b;
+}
+
+.vr-wifi-btn.active .vr-wifi-dot {
+  background: var(--hud-cyan);
+  box-shadow: 0 0 8px var(--hud-cyan);
+  animation: blink 1s infinite;
+}
+
+.vr-urls-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vr-url-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(0, 240, 255, 0.08);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--hud-cyan);
+}
+
+

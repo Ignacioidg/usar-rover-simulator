@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Simulador USAR Rover SAR RESCUE • Teleoperación FPV & HOTAS (Grupo 4 UAI)</title>
+  <title>Simulador USAR Rover SAR RESCUE • Edición Logitech Extreme 3D Pro HOTAS (Grupo 4 UAI)</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -61,9 +61,9 @@
         <span class="status-dot"></span>
         <span>UAI • ROBÓTICA Y TEC. EMERGENTES • GRUPO 4</span>
       </div>
-      <div class="brand-title">USAR ROVER "SAR RESCUE" • GEMELO DIGITAL</div>
+      <div class="brand-title">USAR ROVER "SAR RESCUE" • HOTAS EDITION</div>
       <div class="brand-subtitle">
-        A. Yelin • S. Loray • D. Kegler • I. De Giacomo | Teleoperación FPV &amp; HOTAS
+        A. Yelin • S. Loray • D. Kegler • I. De Giacomo | <strong>Logitech Extreme 3D Pro</strong>
       </div>
     </div>
 
@@ -75,36 +75,46 @@
       </div>
       <div class="compass-meta">
         <span>RUMBO: <strong id="heading-readout" style="color:#00f0ff;">000°</strong></span>
-        <span id="sas-status-pill" class="sas-pill active" title="Click o tecla G para alternar">
+        <span id="sas-status-pill" class="sas-pill active" title="Click, Botón 4 o tecla G para alternar">
           SAS / PID: ESTABILIZADO
         </span>
       </div>
     </div>
 
-    <!-- Acciones Rápidas de Cámara, Iluminación, LiDAR y Ayuda -->
+    <!-- Acciones Rápidas de Joystick Logitech 3D Pro, Casco VR Wi-Fi, Cámara, Iluminación, LiDAR y Ayuda -->
     <div class="top-actions">
-      <button id="btn-cam-mode" class="hud-btn accent" title="Alternar entre 1ra Persona (Visor VR FPV) y 3ra Persona">
-        <span>🎥 VISTA: 3RA PERSONA (EXTERIOR)</span>
-        <span class="key-hint">V</span>
+      <button id="btn-hotas-config" class="hud-btn hotas-badge waiting" title="Abrir Calibrador y Diagnóstico en Vivo para Logitech Extreme 3D Pro (Tecla J)">
+        <span class="hotas-dot" id="hotas-conn-dot"></span>
+        <span id="hotas-conn-label">🕹️ LOGITECH 3D PRO: ESPERANDO USB</span>
+        <span class="key-hint">J</span>
       </button>
-      <button id="btn-pip" class="hud-btn active" title="Mostrar/Ocultar monitor secundario Picture-in-Picture">
+      <button id="btn-vr-wifi" class="hud-btn vr-wifi-btn" title="Activar / Desactivar Streaming Wi-Fi para Celular en Casco VR (Tecla K)">
+        <span class="vr-wifi-dot" id="vr-wifi-dot"></span>
+        <span id="vr-wifi-label">🥽 VR WIFI: OFF</span>
+        <span class="key-hint">K</span>
+      </button>
+      <button id="btn-cam-mode" class="hud-btn accent" title="Alternar entre 1ra Persona (Visor VR FPV) y 3ra Persona (Botón 3 / Tecla V)">
+        <span>🎥 VISTA: 3RA PERSONA</span>
+        <span class="key-hint">B3 / V</span>
+      </button>
+      <button id="btn-pip" class="hud-btn active" title="Mostrar/Ocultar monitor secundario Picture-in-Picture (Botón 10 / Tecla P)">
         <span>📺 PiP</span>
-        <span class="key-hint">P</span>
+        <span class="key-hint">B10 / P</span>
       </button>
-      <button id="btn-lights" class="hud-btn active" title="Reflectores Chasis + LEDs Solidarios al Pan-Tilt">
+      <button id="btn-lights" class="hud-btn active" title="Reflectores Chasis + LEDs Solidarios al Pan-Tilt (Botón 5 / Tecla L)">
         <span>🔦 LUCES: <span id="lights-label">NORMAL</span></span>
-        <span class="key-hint">L</span>
+        <span class="key-hint">B5 / L</span>
       </button>
-      <button id="btn-night" class="hud-btn" title="Simular entorno de derrumbe sin luz solar">
-        <span>🌙 DERRUMBE OSCURO</span>
-        <span class="key-hint">N</span>
+      <button id="btn-night" class="hud-btn" title="Simular entorno de derrumbe sin luz solar (Botón 9 / Tecla N)">
+        <span>🌙 NOCHE</span>
+        <span class="key-hint">B9 / N</span>
       </button>
-      <button id="btn-lidar" class="hud-btn" title="Proyectar nube de puntos óptica Time-of-Flight / Micro-LiDAR">
-        <span>📡 ToF / LiDAR</span>
-        <span class="key-hint">T</span>
+      <button id="btn-lidar" class="hud-btn" title="Proyectar nube de puntos óptica Time-of-Flight / Micro-LiDAR (Botón 6 / Tecla T)">
+        <span>📡 LiDAR</span>
+        <span class="key-hint">B6 / T</span>
       </button>
-      <button id="btn-help" class="hud-btn" title="Ver Controles de Teclado y Ficha de Ingeniería">
-        <span>❓ CONTROLES / FICHA</span>
+      <button id="btn-help" class="hud-btn" title="Ver Manual de Ingeniería y Mapeo Logitech Extreme 3D Pro">
+        <span>❓ MANUAL</span>
         <span class="key-hint">H</span>
       </button>
     </div>
@@ -116,12 +126,12 @@
     <div class="hud-card">
       <div class="card-header">
         <span>⚙ ARQUITECTURA DE TRACCIÓN Y CHASIS</span>
-        <span>SECC. 1-4</span>
+        <span>BOTÓN 7 / 8</span>
       </div>
 
       <div class="selector-group">
         <div class="selector-label">
-          <span>Tracción (Comparativa en Derrumbe):</span>
+          <span>Tracción [Botón 7 Base]:</span>
         </div>
         <div class="segmented-control">
           <button class="seg-btn active" data-drive="8x8" title="8 Ruedas sobredimensionadas (Fiel a la Imagen Conceptual)">
@@ -138,7 +148,7 @@
         <div class="selector-label" style="margin-top:6px;">
           <span>Articulación Fuelle Central:</span>
           <button id="joint-toggle-btn" style="background:none;border:none;color:var(--hud-cyan);font-family:var(--font-mono);font-size:10px;cursor:pointer;text-decoration:underline;">
-            [Tecla M] <span id="joint-mode-val">ACTIVA (SERVO)</span>
+            [B8 / M] <span id="joint-mode-val">ACTIVA (SERVO)</span>
           </button>
         </div>
 
@@ -249,7 +259,7 @@
     <div class="hud-card">
       <div class="card-header">
         <span>📍 ZONAS DE ENSAYO (TELETRANSPORTE)</span>
-        <span>TECLAS 1-4</span>
+        <span>BOTÓN 11 / 1-4</span>
       </div>
       <div class="zone-buttons">
         <button class="zone-btn" data-zone="1">[1] Losas Quebradas</button>
@@ -258,8 +268,16 @@
         <button class="zone-btn" data-zone="4">[4] Túnel Oscuro</button>
       </div>
       <button id="btn-sas" class="hud-btn active" style="width:100%;margin-top:7px;justify-content:center;">
-        <span>🧭 ALTERNAR MODO PID/SAS vs MANUAL</span>
-        <span class="key-hint">G</span>
+        <span>🧭 MODO PID/SAS vs MANUAL</span>
+        <span class="key-hint">B4 / G</span>
+      </button>
+      <button id="btn-open-hotas-side" class="hud-btn" style="width:100%;margin-top:6px;justify-content:center;border-color:rgba(255,122,41,0.5);">
+        <span>🕹️ CALIBRAR LOGITECH 3D PRO</span>
+        <span class="key-hint">J</span>
+      </button>
+      <button id="btn-open-vr-wifi-panel" class="hud-btn" style="width:100%;margin-top:6px;justify-content:center;border-color:rgba(0,240,255,0.45);">
+        <span>🥽 PANEL STREAMING CASCO VR</span>
+        <span class="key-hint">K</span>
       </button>
     </div>
   </aside>
@@ -272,58 +290,398 @@
     </div>
     <div class="pip-footer">
       <span>TORRETA 2-DoF PAN-TILT</span>
-      <span>TECLA [V] INTERCAMBIAR</span>
+      <span>[B3 / V] INTERCAMBIAR</span>
     </div>
   </div>
 
-  <!-- Consola Inferior Central: Mando HOTAS Virtual Adaptado a Teclado -->
+  <!-- Consola Inferior Central: Telemetría en Vivo LOGITECH EXTREME 3D PRO + Fallback Teclado -->
   <footer id="bottom-hotas-bar">
-    <!-- 1. Palanca de Gases (Throttle HOTAS) -->
+    <!-- 1. Palanca de Gases Base (Throttle Slider Logitech Extreme 3D Pro) -->
     <div class="hotas-module">
-      <div class="throttle-track">
+      <div class="throttle-track" title="Palanca Throttle en Base del Logitech Extreme 3D Pro (o W/S y R/F en teclado)">
         <div class="throttle-zero-line"></div>
         <div id="throttle-fill"></div>
+        <div id="throttle-limit-marker" title="Posición física de la Palanca Throttle en la Base"></div>
         <div id="throttle-handle"></div>
       </div>
       <div class="hotas-info">
-        <span class="hotas-title">THROTTLE (TRACCIÓN)</span>
-        <span class="hotas-sub"><span class="kbd">W</span> / <span class="kbd">S</span> Directo</span>
-        <span class="hotas-sub"><span class="kbd">R</span> / <span class="kbd">F</span> Fijar Gases</span>
-        <span class="hotas-sub"><span class="kbd">Espacio</span> Freno 0%</span>
+        <span class="hotas-title">THROTTLE BASE (+/-)</span>
+        <span id="hotas-mode-sub" class="hotas-sub">Modo: Stick Y + Límite</span>
+        <span id="hotas-limit-sub" class="hotas-sub">Techo Potencia: 100%</span>
+        <span class="hotas-sub"><span class="kbd">Gatillo B1</span> Freno 0%</span>
         <span id="hotas-throttle-val" class="hotas-val">+0%</span>
       </div>
     </div>
 
-    <!-- 2. Stick de Dirección y Quiebre Articulado -->
+    <!-- 2. Stick Principal X/Y + Rotación de Puño Twist Z (Rudder) -->
     <div class="hotas-module">
-      <div class="stick-box">
-        <div class="stick-crosshair-h"></div>
-        <div class="stick-crosshair-v"></div>
-        <div id="drive-stick-dot" class="stick-dot orange"></div>
+      <div class="stick-column">
+        <div class="stick-box" title="Ejes X (Roll/Dirección) e Y (Pitch/Avance) del Logitech Extreme 3D Pro">
+          <div class="stick-deadzone-ring" id="stick-deadzone-ring"></div>
+          <div class="stick-crosshair-h"></div>
+          <div class="stick-crosshair-v"></div>
+          <div id="drive-stick-dot" class="stick-dot orange"></div>
+        </div>
+        <div class="twist-bar-track" title="Eje Z Twist (Rotación de Puño del Logitech Extreme 3D Pro)">
+          <div class="twist-center-tick"></div>
+          <div id="twist-bar-dot" class="twist-bar-dot"></div>
+        </div>
       </div>
       <div class="hotas-info">
-        <span class="hotas-title">STICK DIRECCIÓN</span>
-        <span class="hotas-sub"><span class="kbd">A</span> / <span class="kbd">D</span> Doblar Fuelle</span>
-        <span class="hotas-sub"><span class="kbd">Q</span> / <span class="kbd">E</span> Orbitar Cám.</span>
+        <span class="hotas-title">STICK 3D PRO (X/Y/Z)</span>
+        <span class="hotas-sub">Eje Y: Avance / Reversa</span>
+        <span class="hotas-sub">Eje X: Fuelle Articulado</span>
+        <span id="hotas-twist-val" class="hotas-sub" style="color:var(--hud-amber);">Twist Z: 0%</span>
         <span id="hotas-steer-val" class="hotas-val">GIRO: 0%</span>
       </div>
     </div>
 
-    <!-- 3. Cabezal Pan-Tilt 2-DoF (Simulación IMU Visor VR) -->
+    <!-- 3. Cabezal 8-Way POV Hat Switch (Torreta Pan-Tilt 2-DoF) -->
     <div class="hotas-module">
-      <div class="stick-box">
+      <div class="stick-box pov-hat-box" title="Mini-Stick POV Hat de 8 Direcciones en el Cabezal del Logitech Extreme 3D Pro">
         <div class="stick-crosshair-h"></div>
         <div class="stick-crosshair-v"></div>
+        <div class="pov-octagon"></div>
         <div id="turret-stick-dot" class="stick-dot"></div>
       </div>
       <div class="hotas-info">
-        <span class="hotas-title">VISOR VR / PAN-TILT</span>
-        <span class="hotas-sub"><span class="kbd">↑</span> <span class="kbd">↓</span> <span class="kbd">←</span> <span class="kbd">→</span> Mirar</span>
-        <span class="hotas-sub"><span class="kbd">X</span> Centrar Torreta</span>
+        <span class="hotas-title">POV HAT 8-VÍAS</span>
+        <span id="hotas-hat-dir" class="hotas-sub">Hat: CENTRADO</span>
+        <span class="hotas-sub"><span class="kbd">Pulgar B2</span> Centrar 0°</span>
         <span id="hotas-turret-val" class="hotas-val">0° / 0°</span>
       </div>
     </div>
+
+    <!-- 4. Matriz en Vivo de los 12 Botones del Logitech Extreme 3D Pro -->
+    <div class="hotas-module">
+      <div class="hotas-buttons-panel">
+        <div class="hotas-buttons-header">
+          <span>BOTONERA 3D PRO (1–12)</span>
+          <span id="hotas-active-btn-readout" style="color:var(--hud-orange);">LISTO</span>
+        </div>
+        <div class="hotas-btn-grid">
+          <button class="joy-btn-pill" data-joybtn="1" title="Botón 1 (Gatillo): Freno de Emergencia 0% PWM">B1 FRN</button>
+          <button class="joy-btn-pill" data-joybtn="2" title="Botón 2 (Pulgar): Centrar Torreta Pan-Tilt (0°, 0°)">B2 CTR</button>
+          <button class="joy-btn-pill" data-joybtn="3" title="Botón 3 (Cabezal Izq Sup): Alternar Cámara FPV / 3ra Persona">B3 CAM</button>
+          <button class="joy-btn-pill" data-joybtn="4" title="Botón 4 (Cabezal Der Sup): Alternar SAS/PID Estabilizado">B4 SAS</button>
+          <button class="joy-btn-pill" data-joybtn="5" title="Botón 5 (Cabezal Izq Inf): Ciclar Reflectores LED">B5 LED</button>
+          <button class="joy-btn-pill" data-joybtn="6" title="Botón 6 (Cabezal Der Inf): Escáner Láser 3D ToF / LiDAR">B6 ToF</button>
+          <button class="joy-btn-pill base" data-joybtn="7" title="Botón 7 (Base): Cambiar Tracción (8x8 / 6x6 / 4WD)">B7 TRC</button>
+          <button class="joy-btn-pill base" data-joybtn="8" title="Botón 8 (Base): Alternar Fuelle Activo / Pasivo">B8 FLL</button>
+          <button class="joy-btn-pill base" data-joybtn="9" title="Botón 9 (Base): Alternar Modo Noche / Derrumbe Oscuro">B9 NCH</button>
+          <button class="joy-btn-pill base" data-joybtn="10" title="Botón 10 (Base): Mostrar / Ocultar Ventana PiP">B10 PiP</button>
+          <button class="joy-btn-pill base" data-joybtn="11" title="Botón 11 (Base): Teletransportar a Siguiente Zona (1-4)">B11 ZON</button>
+          <button class="joy-btn-pill base" data-joybtn="12" title="Botón 12 (Base): Alternar Modo Throttle (Stick ↔ Crucero) y Nivelar">B12 MOD</button>
+        </div>
+      </div>
+    </div>
   </footer>
+
+  <!-- Modal de Calibración, Diagnóstico y Mapeo en Vivo del LOGITECH EXTREME 3D PRO -->
+  <div id="hotas-modal" class="modal-backdrop hidden">
+    <div class="modal-content hotas-modal-content">
+      <div class="modal-header">
+        <h2>🕹️ CENTRO DE CONTROL &amp; CALIBRACIÓN • LOGITECH EXTREME 3D PRO HOTAS</h2>
+        <button id="btn-close-hotas-modal" class="close-modal-btn">CERRAR [ESC / J]</button>
+      </div>
+
+      <div class="hotas-status-strip" id="hotas-modal-status-strip">
+        <div>
+          <strong id="hotas-device-name">Ningún joystick USB detectado aún</strong>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">
+            Conectá tu <strong>Logitech Extreme 3D Pro</strong> por USB y <strong>presioná el gatillo (Botón 1) o mové el stick</strong> para que el navegador lo active mediante Web Gamepad API.
+          </div>
+        </div>
+        <button id="btn-reset-hotas-defaults" class="hud-btn" title="Restaurar configuración predeterminada para Logitech Extreme 3D Pro">
+          ↺ RESTAURAR FÁBRICA
+        </button>
+      </div>
+
+      <div class="hotas-calib-grid">
+        <!-- Columna Izquierda: Asignación de Ejes, Auto-Detección y Curvas -->
+        <div class="hotas-calib-card">
+          <h3>1. CALIBRACIÓN Y AUTO-DETECCIÓN DE LOS 4 EJES + POV HAT</h3>
+          <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">
+            Si algún eje (como el <em>Twist Z</em> o la leva <em>Throttle</em> de la base) no responde en tu versión de Windows/Chrome, hacé clic en <strong>"🎯 Detectar"</strong> y mové ese control físico en el joystick.
+          </p>
+
+          <!-- Eje X -->
+          <div class="axis-calib-row">
+            <div class="axis-calib-top">
+              <span class="axis-name">EJE X • Stick Izq/Der (Dirección Fuelle)</span>
+              <div class="axis-controls">
+                <select id="cfg-axis-x" class="axis-select">
+                  <option value="0">Eje 0 (Estándar X)</option>
+                  <option value="1">Eje 1</option>
+                  <option value="2">Eje 2</option>
+                  <option value="3">Eje 3</option>
+                </select>
+                <button class="learn-axis-btn" data-learn="axisX">🎯 Detectar</button>
+                <label class="inv-label"><input type="checkbox" id="cfg-inv-x" /> Inv</label>
+              </div>
+            </div>
+            <div class="axis-bar-bg">
+              <div id="calib-bar-x" class="axis-bar-fill" style="width:50%;"></div>
+            </div>
+          </div>
+
+          <!-- Eje Y -->
+          <div class="axis-calib-row">
+            <div class="axis-calib-top">
+              <span class="axis-name">EJE Y • Stick Adelante/Atrás (Tracción)</span>
+              <div class="axis-controls">
+                <select id="cfg-axis-y" class="axis-select">
+                  <option value="1">Eje 1 (Estándar Y)</option>
+                  <option value="0">Eje 0</option>
+                  <option value="2">Eje 2</option>
+                  <option value="3">Eje 3</option>
+                </select>
+                <button class="learn-axis-btn" data-learn="axisY">🎯 Detectar</button>
+                <label class="inv-label"><input type="checkbox" id="cfg-inv-y" /> Inv</label>
+              </div>
+            </div>
+            <div class="axis-bar-bg">
+              <div id="calib-bar-y" class="axis-bar-fill orange" style="width:50%;"></div>
+            </div>
+          </div>
+
+          <!-- Eje Twist Z (Rudder) -->
+          <div class="axis-calib-row">
+            <div class="axis-calib-top">
+              <span class="axis-name">EJE Z TWIST • Rotación de Puño (Rudder)</span>
+              <div class="axis-controls">
+                <select id="cfg-axis-twist" class="axis-select">
+                  <option value="auto">Auto (Eje 2 / Eje 5)</option>
+                  <option value="2">Eje 2 (DirectInput)</option>
+                  <option value="5">Eje 5 (Chrome HID Rz)</option>
+                  <option value="3">Eje 3</option>
+                  <option value="4">Eje 4</option>
+                </select>
+                <button class="learn-axis-btn" data-learn="axisTwist">🎯 Detectar</button>
+                <label class="inv-label"><input type="checkbox" id="cfg-inv-twist" /> Inv</label>
+              </div>
+            </div>
+            <div class="axis-bar-bg">
+              <div id="calib-bar-twist" class="axis-bar-fill amber" style="width:50%;"></div>
+            </div>
+          </div>
+
+          <!-- Palanca Throttle Slider (Base) -->
+          <div class="axis-calib-row">
+            <div class="axis-calib-top">
+              <span class="axis-name">THROTTLE SLIDER • Leva en la Base (+/-)</span>
+              <div class="axis-controls">
+                <select id="cfg-axis-throttle" class="axis-select">
+                  <option value="auto">Auto (Eje 3 / Eje 6)</option>
+                  <option value="3">Eje 3 (DirectInput)</option>
+                  <option value="6">Eje 6 (Chrome Slider)</option>
+                  <option value="2">Eje 2</option>
+                  <option value="4">Eje 4</option>
+                </select>
+                <button class="learn-axis-btn" data-learn="axisThrottle">🎯 Detectar</button>
+                <label class="inv-label"><input type="checkbox" id="cfg-inv-throttle" checked /> Inv</label>
+              </div>
+            </div>
+            <div class="axis-bar-bg">
+              <div id="calib-bar-throttle" class="axis-bar-fill green" style="width:100%;"></div>
+            </div>
+          </div>
+
+          <!-- Ajustes de Modo de Conducción y Sensibilidad -->
+          <div class="hotas-tuning-grid">
+            <div class="tuning-row">
+              <label>Modo de Palanca Throttle y Stick Y:</label>
+              <select id="cfg-throttle-mode" class="rf-select">
+                <option value="stick_drive">Modo Rover Directo: Stick Y = Avance/Reversa | Leva Base = Límite Potencia PWM</option>
+                <option value="hotas_cruise">Modo Crucero HOTAS: Leva Base = Gases Continuos | Stick Y = Aceleración Momentánea</option>
+              </select>
+            </div>
+
+            <div class="tuning-row">
+              <label>Función de la Rotación de Puño (Twist Z):</label>
+              <select id="cfg-twist-mode" class="rf-select">
+                <option value="turret_and_steer">Híbrido USAR: Mirar con Torreta Pan-Tilt + 35% Asistencia Giro</option>
+                <option value="turret_pan">Solo Rotación Horizontal de Torreta Pan-Tilt (Yaw)</option>
+                <option value="rover_steer">Dirección Articulada del Rover (Giro con Muñeca)</option>
+                <option value="cam_orbit">Orbitar Cámara Exterior de 3ra Persona</option>
+              </select>
+            </div>
+
+            <div class="slider-pair">
+              <div>
+                <div class="selector-label">
+                  <span>Zona Muerta Stick X/Y:</span>
+                  <span id="lbl-deadzone-stick" style="color:var(--hud-cyan);">8%</span>
+                </div>
+                <input type="range" id="cfg-deadzone-stick" min="0" max="25" value="8" class="hud-range" />
+              </div>
+              <div>
+                <div class="selector-label">
+                  <span>Curva Exponencial (Expo):</span>
+                  <span id="lbl-expo-curve" style="color:var(--hud-cyan);">35%</span>
+                </div>
+                <input type="range" id="cfg-expo-curve" min="0" max="75" value="35" class="hud-range" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Inspector de Ejes Crudos del Navegador -->
+          <div class="raw-axes-box">
+            <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">TELEMETRÍA CRUDA (gamepad.axes):</span>
+            <div id="raw-axes-readout" class="raw-axes-readout">Esperando entrada de Logitech Extreme 3D Pro...</div>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Mapa Físico de los 12 Botones del Logitech Extreme 3D Pro -->
+        <div class="hotas-calib-card">
+          <h3>2. MAPA OFICIAL DE LOS 12 BOTONES • LOGITECH EXTREME 3D PRO</h3>
+          <p style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">
+            Presioná cualquier botón en tu joystick físico para verificar su respuesta en vivo (se iluminará en verde/naranja):
+          </p>
+          <table class="controls-table hotas-map-table">
+            <thead>
+              <tr>
+                <th>Botón 3D Pro</th>
+                <th>Ubicación Física</th>
+                <th>Acción en el Rover USAR</th>
+              </tr>
+            </thead>
+            <tbody id="hotas-modal-btn-table">
+              <tr data-btnrow="1">
+                <td><span class="kbd">Botón 1</span></td>
+                <td>Gatillo (Índice)</td>
+                <td><strong>Freno de Emergencia</strong> y corte instantáneo a 0% PWM</td>
+              </tr>
+              <tr data-btnrow="2">
+                <td><span class="kbd">Botón 2</span></td>
+                <td>Pulgar Lateral</td>
+                <td><strong>Centrar Torreta Pan-Tilt</strong> (0°, 0°) / Invertir Marcha en Crucero</td>
+              </tr>
+              <tr data-btnrow="3">
+                <td><span class="kbd">Botón 3</span></td>
+                <td>Cabezal Sup. Izq.</td>
+                <td>Alternar cámara <strong>1ra Persona (FPV VR) ↔ 3ra Persona</strong></td>
+              </tr>
+              <tr data-btnrow="4">
+                <td><span class="kbd">Botón 4</span></td>
+                <td>Cabezal Sup. Der.</td>
+                <td>Alternar <strong>Modo Estabilizado (PID / SAS) ↔ Manual Directo</strong></td>
+              </tr>
+              <tr data-btnrow="5">
+                <td><span class="kbd">Botón 5</span></td>
+                <td>Cabezal Inf. Izq.</td>
+                <td>Ciclar potencia de <strong>Reflectores LED</strong> (Off / Normal / Max USAR)</td>
+              </tr>
+              <tr data-btnrow="6">
+                <td><span class="kbd">Botón 6</span></td>
+                <td>Cabezal Inf. Der.</td>
+                <td>Activar / Desactivar escáner láser 3D <strong>ToF / Micro-LiDAR</strong></td>
+              </tr>
+              <tr data-btnrow="7">
+                <td><span class="kbd">Botón 7</span></td>
+                <td>Base (Fila 1 Izq.)</td>
+                <td>Alternar tracción en vivo: <strong>8x8 Concept → 6x6 USAR → 4WD Cátedra</strong></td>
+              </tr>
+              <tr data-btnrow="8">
+                <td><span class="kbd">Botón 8</span></td>
+                <td>Base (Fila 1 Der.)</td>
+                <td>Alternar articulación del fuelle: <strong>Activa (Servo) ↔ Pasiva (3D)</strong></td>
+              </tr>
+              <tr data-btnrow="9">
+                <td><span class="kbd">Botón 9</span></td>
+                <td>Base (Fila 2 Izq.)</td>
+                <td>Alternar iluminación ambiental: <strong>Luz Diurna ↔ Derrumbe Oscuro</strong></td>
+              </tr>
+              <tr data-btnrow="10">
+                <td><span class="kbd">Botón 10</span></td>
+                <td>Base (Fila 2 Der.)</td>
+                <td>Mostrar / Ocultar monitor secundario <strong>Picture-in-Picture (PiP)</strong></td>
+              </tr>
+              <tr data-btnrow="11">
+                <td><span class="kbd">Botón 11</span></td>
+                <td>Base (Fila 3 Izq.)</td>
+                <td><strong>Teletransportar</strong> a la siguiente Zona de Ensayo (Zonas 1 → 4)</td>
+              </tr>
+              <tr data-btnrow="12">
+                <td><span class="kbd">Botón 12</span></td>
+                <td>Base (Fila 3 Der.)</td>
+                <td>Alternar <strong>Modo Throttle (Stick ↔ Crucero)</strong> y Nivelar Chasis</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Transmisión Wi-Fi bajo demanda para Celular en Casco VR -->
+  <div id="vr-wifi-modal" class="modal-backdrop hidden">
+    <div class="modal-content" style="max-width:740px;">
+      <div class="modal-header">
+        <h2>🥽 TRANSMISIÓN WI-FI PARA CELULAR EN CASCO VR (BAJA DEMANDA)</h2>
+        <button id="btn-close-vr-wifi-modal" class="close-modal-btn">CERRAR [ESC]</button>
+      </div>
+
+      <div class="hotas-status-strip" id="vr-wifi-status-strip">
+        <div>
+          <strong id="vr-wifi-state-title">⏹ TRANSMISIÓN VR WI-FI DESACTIVADA (0% USO DE RED)</strong>
+          <div id="vr-wifi-state-sub" style="font-size:11px;color:var(--text-muted);margin-top:3px;">
+            El streaming está apagado por defecto. Pulsá el botón de la derecha (o la tecla <strong>K</strong>) únicamente cuando quieras transmitir al teléfono.
+          </div>
+        </div>
+        <button id="btn-toggle-vr-stream-main" class="hud-btn accent" style="padding:10px 16px;font-size:12px;">
+          ▶ ACTIVAR STREAMING VR
+        </button>
+      </div>
+
+      <div class="hotas-calib-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="hotas-calib-card">
+          <h3>1. DIRECCIÓN WEB PARA ABRIR EN EL CELULAR</h3>
+          <p style="font-size:11px;color:var(--text-muted);margin-bottom:8px;">
+            Conectá el celular a la <strong>misma red Wi-Fi (o Hotspot de la PC)</strong> y escribí cualquiera de estas direcciones en el navegador del teléfono (Chrome / Safari):
+          </p>
+          <div id="vr-wifi-urls-box" class="vr-urls-list">
+            <div class="vr-url-item">http://10.110.16.176:8090/vr</div>
+          </div>
+          <p id="vr-server-hint" style="font-size:10.5px;color:var(--hud-amber);margin-top:8px;line-height:1.4;">
+            💡 Asegurate de haber iniciado el simulador desde <code>INICIAR_SIMULADOR.bat</code> (o ejecutando <code>python wifi_vr_server.py</code>) para habilitar el puerto local 8090.
+          </p>
+        </div>
+
+        <div class="hotas-calib-card">
+          <h3>2. AJUSTES DEL VISOR VR Y CÁMARA</h3>
+          <div class="tuning-row" style="margin-bottom:8px;">
+            <label>Cámara enviada al Casco VR del Celular:</label>
+            <select id="vr-cfg-cam-source" class="rf-select">
+              <option value="fpv">Siempre Cámara 1ra Persona FPV (Torreta Pan-Tilt)</option>
+              <option value="mirror">Espejar Vista Actual de la Pantalla PC</option>
+            </select>
+          </div>
+
+          <div class="tuning-row" style="margin-bottom:8px;">
+            <label>Calidad / Latencia de Transmisión Wi-Fi:</label>
+            <select id="vr-cfg-quality" class="rf-select">
+              <option value="fast">Fluidez Máxima VR (480×300 • ~28 FPS • &lt;35 ms)</option>
+              <option value="balanced" selected>Equilibrado USAR (600×375 • ~24 FPS)</option>
+              <option value="hd">Alta Definición (768×480 • ~18 FPS)</option>
+            </select>
+          </div>
+
+          <label class="inv-label" style="font-size:11px;color:#e2e8f0;margin-top:10px;">
+            <input type="checkbox" id="vr-cfg-allow-gyro" checked />
+            Permitir que el Giroscopio del Celular mueva la Torreta Pan-Tilt
+          </label>
+
+          <div class="raw-axes-box" style="margin-top:12px;">
+            <span style="font-size:10px;color:var(--text-muted);font-family:var(--font-mono);">TELEMETRÍA DE ENLACE VR WI-FI:</span>
+            <div id="vr-wifi-telemetry-readout" class="raw-axes-readout">
+              Estado: Inactivo | Clientes VR: 0 | Fotogramas enviados: 0
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal de Ficha de Ingeniería, Imagen Conceptual y Controles -->
   <div id="engineering-modal" class="modal-backdrop hidden">
@@ -337,71 +695,74 @@
           <img src="assets/concept-rover.jpg" alt="Concept Art Rover USAR" class="concept-preview" />
           <p style="font-size:12px;color:var(--text-muted);line-height:1.5;">
             <strong>Evolución de Plataforma Educativa a Rover USAR (Grupo 4 - UAI):</strong>
-            Este Gemelo Digital implementa el chasis bi-modular articulado con fuelle central (3 grados de libertad:
+            Este Gemelo Digital está integrado nativamente con el joystick <strong>Logitech Extreme 3D Pro</strong> mediante Web Gamepad API,
+            implementando el chasis bi-modular articulado con fuelle central (3 grados de libertad:
             <em>Yaw</em> de dirección quebrada, <em>Pitch</em> de inclinación y <em>Roll</em> de torsión sobre escombros),
-            ruedas sobredimensionadas con suspensión independiente, torreta Pan-Tilt 2-DoF con iluminación LED solidaria
-            y telemetría dual <strong>HC-SR04 + Óptico ToF / Micro-LiDAR</strong>.
+            torreta Pan-Tilt 2-DoF en el <em>POV Hat</em> y telemetría dual <strong>HC-SR04 + Óptico ToF / Micro-LiDAR</strong>.
           </p>
         </div>
         <div>
           <h3 style="font-size:13px;color:var(--hud-cyan);font-family:var(--font-mono);margin-bottom:6px;">
-            MAPEO DE CONTROLES (HOTAS VIRTUAL EN TECLADO)
+            RESUMEN DE CONTROLES: LOGITECH EXTREME 3D PRO &amp; TECLADO
           </h3>
           <table class="controls-table">
             <thead>
               <tr>
-                <th>Tecla / Entrada</th>
+                <th>Logitech Extreme 3D Pro</th>
+                <th>Teclado</th>
                 <th>Función en el Rover USAR</th>
               </tr>
             </thead>
             <tbody>
               <tr>
+                <td><strong>Stick Eje Y</strong> (Adelante/Atrás)</td>
                 <td><span class="kbd">W</span> / <span class="kbd">S</span></td>
-                <td>Aceleración y Reversa proporcional con rampa exponencial</td>
+                <td>Aceleración y Reversa proporcional con curva exponencial</td>
               </tr>
               <tr>
+                <td><strong>Palanca Throttle Base (+/-)</strong></td>
                 <td><span class="kbd">R</span> / <span class="kbd">F</span></td>
-                <td>Subir / Bajar palanca de gases fija (Modo Throttle HOTAS)</td>
+                <td>Regulador de Potencia PWM (o Gases Continuos en Modo Crucero)</td>
               </tr>
               <tr>
+                <td><strong>Stick Eje X</strong> (Izq/Der)</td>
                 <td><span class="kbd">A</span> / <span class="kbd">D</span></td>
                 <td>Dirección articulada del fuelle central + asistencia diferencial</td>
               </tr>
               <tr>
-                <td><span class="kbd">Espacio</span></td>
-                <td>Freno de emergencia y corte de gases a 0% PWM</td>
+                <td><strong>Twist Z</strong> (Rotación Puño)</td>
+                <td><span class="kbd">Q</span> / <span class="kbd">E</span></td>
+                <td>Paneo horizontal rápido de Torreta + asistencia de giro</td>
               </tr>
               <tr>
+                <td><strong>POV Hat 8-Vías</strong> (Cabezal)</td>
                 <td><span class="kbd">↑</span> <span class="kbd">↓</span> <span class="kbd">←</span> <span class="kbd">→</span></td>
-                <td>Mover Torreta Pan-Tilt 2-DoF (Simulación de giro de cabeza VR)</td>
+                <td>Mover Torreta Pan-Tilt 2-DoF (Visión activa desacoplada)</td>
               </tr>
               <tr>
+                <td><strong>Gatillo (Botón 1)</strong></td>
+                <td><span class="kbd">Espacio</span></td>
+                <td>Freno de emergencia y corte instantáneo a 0% PWM</td>
+              </tr>
+              <tr>
+                <td><strong>Botón 2</strong> (Pulgar)</td>
                 <td><span class="kbd">X</span> o <span class="kbd">C</span></td>
                 <td>Centrar Torreta Pan-Tilt al frente del chasis (0°, 0°)</td>
               </tr>
               <tr>
-                <td><span class="kbd">V</span></td>
-                <td>Alternar cámara <strong>1ra Persona (FPV VR)</strong> ↔ <strong>3ra Persona</strong></td>
+                <td><strong>Botón 3</strong> / <strong>Botón 4</strong></td>
+                <td><span class="kbd">V</span> / <span class="kbd">G</span></td>
+                <td>Alternar Cámara FPV ↔ 3ra Persona / Alternar SAS PID</td>
               </tr>
               <tr>
-                <td><span class="kbd">P</span></td>
-                <td>Mostrar / Ocultar ventana secundaria <strong>Picture-in-Picture (PiP)</strong></td>
+                <td><strong>Botón 5</strong> / <strong>Botón 6</strong></td>
+                <td><span class="kbd">L</span> / <span class="kbd">T</span></td>
+                <td>Ciclar Reflectores LED / Escáner Láser 3D ToF Micro-LiDAR</td>
               </tr>
               <tr>
-                <td><span class="kbd">G</span></td>
-                <td>Alternar <strong>Modo Estabilizado (PID / SAS)</strong> vs <strong>Manual Directo</strong></td>
-              </tr>
-              <tr>
-                <td><span class="kbd">L</span> / <span class="kbd">N</span></td>
-                <td>Ciclar potencia de <strong>Reflectores LED</strong> / Modo <strong>Derrumbe Oscuro</strong></td>
-              </tr>
-              <tr>
-                <td><span class="kbd">T</span></td>
-                <td>Activar escáner láser 3D <strong>Time-of-Flight / Micro-LiDAR</strong></td>
-              </tr>
-              <tr>
-                <td><span class="kbd">1</span> <span class="kbd">2</span> <span class="kbd">3</span> <span class="kbd">4</span></td>
-                <td>Teletransportar el rover a las 4 zonas de prueba del derrumbe</td>
+                <td><strong>Botones Base 7 a 12</strong></td>
+                <td><span class="kbd">M</span> <span class="kbd">N</span> <span class="kbd">P</span> <span class="kbd">1-4</span></td>
+                <td>Tracción (B7), Fuelle (B8), Noche (B9), PiP (B10), Zonas (B11), Modo (B12)</td>
               </tr>
             </tbody>
           </table>
@@ -414,6 +775,7 @@
   <script src="vendor/three.min.js"></script>
   <script src="roverBuilder.js"></script>
   <script src="terrainBuilder.js"></script>
+  <script src="hotasController.js"></script>
   <script src="simulator.js"></script>
 </body>
 </html>
